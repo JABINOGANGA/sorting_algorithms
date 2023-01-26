@@ -1,91 +1,88 @@
 #include "sort.h"
 
-void quick_sort(int *array, size_t size);
-void swap_int(int *a, int *b);
-void partion_sort(int *array, size_t size, int lower_b, int upper_b);
-int lomuto_partition(int *array, size_t size, int lower_b, int upper_b);
-
 /**
- * swap_int - swap ywo integer
- * @a: first integer to swap
- * @b: second integer to swap
+ * swap_indexes - swap the values at two indexes
+ * @a: the first index to be swapped
+ * @b: the second index to be swapped
+ *
+ * Return: nothing
  */
-
-void swap_int(int *a, int *b)
+void swap_indexes(int *a, int *b)
 {
-	int temp;
+	int temp = *a;
 
-	temp = *a;
 	*a = *b;
 	*b = temp;
 }
 
 /**
- * lomuto_partition - lomuto_partition the array
- * @array: array of integers to sort
- * @size: size of the array
- * @lower_b: lower boundary of the array
- * @upper_b: upper boundary of the array
- * Return: return the position of the pivot
+ * partition - partitions the array
+ * @array: the array to be sorted
+ * @lo: the lower bound of the array
+ * @hi: the upper bound of the array
+ * @size: number of elements that the array has
+ *
+ * Return: the index of the pivot
  */
-int lomuto_partition(int *array, size_t size, int lower_b, int upper_b)
+int partition(int *array, int lo, int hi, int size)
 {
-	int *pivot;
-	int current_index, below;
+	int pivot = array[hi], j = lo - 1;
+	int i = 0;
 
-	pivot = array + upper_b;
-	for (current_index = below = lower_b; below < upper_b; below++)
+	for (i = lo; i < hi; i++)
 	{
-		if (array[below] < *pivot)
+		if (array[i] <= pivot)
 		{
-			if (current_index < below)
+			j++;
+			if (j != i)
 			{
-				swap_int(array + below, array + current_index);
+				swap_indexes(&array[i], &array[j]);
 				print_array(array, size);
 			}
-			current_index++;
 		}
 	}
 
-	if (array[current_index] > *pivot)
+	if (pivot < array[j + 1])
 	{
-		swap_int(array + current_index, pivot);
+		swap_indexes(&array[hi], &array[j + 1]);
 		print_array(array, size);
 	}
-
-	return (current_index);
+	return (j + 1);
 }
 
 /**
- * quick_sort - quick sort
- * @array: array of integers to sort
- * @size: size of the array
+ * sorter - quick sort function
+ * @array: the array to be sorted
+ * @lo: the lower bound of the array
+ * @hi: the upper bound of the array
+ * @size: number of elements that the array has
  */
-
-void quick_sort(int *array, size_t size)
+void sorter(int *array, int lo, int hi, size_t size)
 {
-	if (array == NULL || size < 2)
-		return;
+	size_t p = 0;
 
-	partion_sort(array, size, 0, size - 1);
-}
-
-/**
- * partion_sort - partition the array and sort recursively
- * @array: array of element to sort
- * @size: size of the array to sort
- * @lower_b: lower boundary of the list
- * @upper_b: upper boundary of the list
- */
-
-void partion_sort(int *array, size_t size, int lower_b, int upper_b)
-{
-	int location;
-
-	if (lower_b < upper_b)
+	if (lo < hi)
 	{
-		location = lomuto_partition(array, size, lower_b, upper_b);
-		partion_sort(array, size, lower_b, location - 1);
-		partion_sort(array, size, location + 1, upper_b);
+		p = partition(array, lo, hi, size);
+		if (p > 0)
+			sorter(array, lo, p - 1, size);
+		if (p != size)
+			sorter(array, p + 1, hi, size);
 	}
 }
+
+/**
+ * quick_sort - a function that sorts an array by quick sort
+ * @array: the array to be sorted
+ * @size: number of elements that the array has
+ */
+void quick_sort(int *array, size_t size)
+{
+	int lo = 0, hi = size - 1;
+
+	if (!array || size == 0)
+		return;
+
+	sorter(array, lo, hi, size);
+}
+
